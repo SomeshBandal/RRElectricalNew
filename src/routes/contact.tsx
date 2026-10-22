@@ -1,0 +1,26 @@
+import { useState, type FormEvent, type ReactNode } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { CheckCircle2, Mail, MapPin, Phone } from "lucide-react";
+import { PageShell, PageHero } from "@/components/PageShell";
+import { Reveal } from "@/components/Reveal";
+import { Button } from "@/components/ui/button";
+import { company } from "@/data/site";
+const sectorOptions = ["Government", "Hotel", "Residential", "Showroom", "Industrial"] as const;
+
+export const Route = createFileRoute("/contact")({ component: ContactPage, head: () => ({ meta: [
+  { title: "Request a Site Survey | R R Enterprises and Electricals" }, { name: "description", content: "Get in touch with R R Enterprises and Electricals for tenders, rewires, hotel fit-outs and showroom lighting. Site survey booked within two working days." },
+  { property: "og:title", content: "Request a Site Survey | R R Enterprises and Electricals" }, { property: "og:description", content: "Share your scope and timeline — we respond with a survey slot and a priced scope." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },
+], links: [{ rel: "canonical", href: "/contact" }] }) });
+
+function ContactPage() {
+  const [sector, setSector] = useState<string>("Government"); const [sent, setSent] = useState(false);
+  const onSubmit = (e: FormEvent) => { e.preventDefault(); setSent(true); };
+  return <PageShell><PageHero eyebrow="Start an enquiry" title="Tell us what needs power." lead="Share the building, scope and rough timeline. We reply within one working day with a site-survey slot." />
+    <section className="site-container py-16 md:py-24"><div className="grid gap-10 lg:grid-cols-[.8fr_1.2fr]">
+      <Reveal><div><p className="section-kicker">Direct contact</p><h2 className="mt-4 text-3xl">Talk to the team responsible for the work.</h2><p className="mt-4 max-w-md leading-relaxed text-muted-foreground">For tender packages, attach the BOQ, drawings or notice to your email. We will return a compliant, itemised quotation.</p><div className="mt-9 grid gap-4"><ContactRow icon={Phone} label="Phone" value={company.phone} href={`tel:${company.phone.replace(/\s/g, "")}`} /><ContactRow icon={Mail} label="Email" value={company.email} href={`mailto:${company.email}`} /><ContactRow icon={MapPin} label="Based in" value={company.city} /></div><div className="mt-8 rounded-xl bg-secondary p-6"><p className="font-semibold text-foreground">Response standard</p><p className="mt-2 text-sm leading-relaxed text-muted-foreground">Enquiries answered within one working day. Survey slots are normally available within two working days.</p></div></div></Reveal>
+      <Reveal delay={100}><div className="glow-card rounded-xl p-7 md:p-10">{sent ? <div className="grid min-h-[430px] place-items-center text-center"><div><CheckCircle2 className="mx-auto size-12 text-primary" /><h2 className="mt-5 text-3xl">Enquiry noted</h2><p className="mx-auto mt-3 max-w-md text-muted-foreground">Nothing is sent anywhere yet — connect an inbox and this form will start delivering enquiries to you.</p></div></div> : <form className="space-y-5" onSubmit={onSubmit}><div className="grid gap-5 sm:grid-cols-2"><Field label="Name"><input required type="text" placeholder="Full name" className={inputCls} /></Field><Field label="Phone"><input required type="tel" placeholder="Mobile number" className={inputCls} /></Field></div><Field label="Email"><input type="email" placeholder="you@example.com" className={inputCls} /></Field><Field label="Project type"><div className="flex flex-wrap gap-2">{sectorOptions.map((s) => <Button key={s} type="button" variant="outline" size="sm" data-active={sector === s} className="filter-pill rounded-full" onClick={() => setSector(s)}>{s}</Button>)}</div></Field><Field label="Project brief"><textarea rows={5} placeholder="Site, scope, timeline…" className={`${inputCls} resize-none`} /></Field><Button type="submit" size="lg" className="action-button w-full">Submit enquiry</Button></form>}</div></Reveal>
+    </div></section></PageShell>;
+}
+const inputCls = "w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/65 focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/15";
+function Field({ label, children }: { label: string; children: ReactNode }) { return <label className="block"><span className="mb-2 block text-sm font-semibold text-foreground">{label}</span>{children}</label>; }
+function ContactRow({ icon: Icon, label, value, href }: { icon: typeof Phone; label: string; value: string; href?: string }) { const content = <><span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-secondary text-primary"><Icon className="size-4" /></span><span><span className="block text-xs text-muted-foreground">{label}</span><span className="mt-1 block break-all font-semibold text-foreground">{value}</span></span></>; return href ? <a href={href} className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 hover:border-primary">{content}</a> : <div className="flex items-center gap-4 rounded-xl border border-border bg-card p-4">{content}</div>; }
